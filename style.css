@@ -14,7 +14,11 @@ body {
 .poster {
     width: 1440px;
     min-height: 100vh;
-    background: linear-gradient(135deg, #1a3a5c 0%, #0d2137 100%);
+    background-color: #ffffff;
+    background-image: url('res/bg-header.png');
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    background-position: top left;
     position: relative;
     overflow: hidden;
 }
