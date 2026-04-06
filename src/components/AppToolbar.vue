@@ -9,6 +9,7 @@
       @change="onFileChange"
     />
     <span class="toolbar-filename">{{ fileName }}</span>
+    <span class="toolbar-status" v-if="statusText">{{ statusText }}</span>
     <button class="toolbar-btn" @click="$emit('refresh')">🔄 刷新数据</button>
     <label class="toolbar-label">📅 日期：</label>
     <input
@@ -27,6 +28,7 @@ import { ref } from 'vue'
 const props = defineProps<{
   fileName: string
   dateValue: string
+  statusText: string
 }>()
 
 const emit = defineEmits<{

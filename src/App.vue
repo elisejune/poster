@@ -2,6 +2,7 @@
   <AppToolbar
     :file-name="fileName"
     :date-value="dateValue"
+    :status-text="statusText"
     @update:date-value="dateValue = $event"
     @upload="onUpload"
     @screenshot="onScreenshot"
@@ -47,6 +48,11 @@ const displayDate = computed(() => {
 const { fileName, commendData, noticeData, loadFile, refresh } = useExcel()
 const { takeScreenshot } = useScreenshot()
 
+const statusText = computed(() => {
+  if (commendRows.value.length === 0 && noticeRows.value.length === 0) return ''
+  return `本期表扬 ${commendRows.value.length} 条，批评 ${noticeRows.value.length} 条`
+})
+
 const toast = reactive({ visible: false, message: '', type: 'success' as 'success' | 'error' | 'info' })
 let toastTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -61,7 +67,7 @@ function showToast(message: string, type: 'success' | 'error' | 'info' = 'succes
 async function onUpload(file: File) {
   try {
     await loadFile(file)
-    showToast(`✅ 文件 "${file.name}" 加载成功，共 ${commendData.value.length} 条表扬、${noticeData.value.length} 条批评记录`)
+    showToast(`✅ 文件加载成功`)
   } catch {
     showToast('❌ 文件读取失败，请检查文件格式', 'error')
   }

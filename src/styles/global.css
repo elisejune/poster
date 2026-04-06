@@ -63,6 +63,16 @@ body {
   border-radius: 4px;
 }
 
+.toolbar-status {
+  font-size: 13px;
+  color: #1976d2;
+  font-weight: 500;
+  background: #e3f2fd;
+  padding: 4px 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
 /* ==================== 海报容器 ==================== */
 
 .poster {
@@ -177,11 +187,11 @@ body {
 .notice-section .report-table th:nth-child(1),
 .notice-section .report-table td:nth-child(1) { width: 150px; }
 .notice-section .report-table th:nth-child(2),
-.notice-section .report-table td:nth-child(2) { width: 200px; }
+.notice-section .report-table td:nth-child(2) { width: 180px; }
 .notice-section .report-table th:nth-child(3),
-.notice-section .report-table td:nth-child(3) { width: 200px; }
+.notice-section .report-table td:nth-child(3) { width: 180px; }
 .notice-section .report-table th:nth-child(5),
-.notice-section .report-table td:nth-child(5) { width: 300px; }
+.notice-section .report-table td:nth-child(5) { width: 220px; }
 .notice-section .report-table th:nth-child(6),
 .notice-section .report-table td:nth-child(6) { width: 180px; }
 
