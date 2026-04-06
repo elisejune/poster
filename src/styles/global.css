@@ -161,7 +161,7 @@ body {
 
 /* 表扬通报列宽 */
 .commend-section .report-table th:nth-child(1),
-.commend-section .report-table td:nth-child(1) { width: 120px; }
+.commend-section .report-table td:nth-child(1) { width: 150px; }
 .commend-section .report-table th:nth-child(2),
 .commend-section .report-table td:nth-child(2) { width: 200px; }
 .commend-section .report-table th:nth-child(3),
@@ -171,7 +171,7 @@ body {
 
 /* 违规通报列宽 */
 .notice-section .report-table th:nth-child(1),
-.notice-section .report-table td:nth-child(1) { width: 120px; }
+.notice-section .report-table td:nth-child(1) { width: 150px; }
 .notice-section .report-table th:nth-child(2),
 .notice-section .report-table td:nth-child(2) { width: 200px; }
 .notice-section .report-table th:nth-child(3),

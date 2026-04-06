@@ -46,29 +46,31 @@ const { takeScreenshot } = useScreenshot()
 
 const commendRows = computed(() => {
   const endDate = new Date(dateValue.value)
-  return commendData.value
-    .filter(r => isInPreviousWeek(r.date, endDate))
-    .map(r => [
-      r.name,
-      r.department,
-      r.eventType,
-      r.event,
-      r.cumulative + '次',
-    ])
+  console.log('[表扬] 当前设置日期:', dateValue.value)
+  const filtered = commendData.value.filter(r => isInPreviousWeek(r.date, endDate))
+  filtered.forEach(r => console.log(`[表扬] ${r.name} - 事件时间: ${r.date}`))
+  return filtered.map(r => [
+    r.name,
+    r.department,
+    r.eventType,
+    r.event,
+    r.cumulative + '次',
+  ])
 })
 
 const noticeRows = computed(() => {
   const endDate = new Date(dateValue.value)
-  return noticeData.value
-    .filter(r => isInPreviousWeek(r.date, endDate))
-    .map(r => [
-      r.name,
-      r.department,
-      r.eventType,
-      r.event,
-      r.basis,
-      r.cumulative + '次',
-    ])
+  console.log('[批评] 当前设置日期:', dateValue.value)
+  const filtered = noticeData.value.filter(r => isInPreviousWeek(r.date, endDate))
+  filtered.forEach(r => console.log(`[批评] ${r.name} - 事件时间: ${r.date}`))
+  return filtered.map(r => [
+    r.name,
+    r.department,
+    r.eventType,
+    r.event,
+    r.basis,
+    r.cumulative + '次',
+  ])
 })
 
 function onScreenshot() {
