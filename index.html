@@ -5,15 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>信息技术部黑板报</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="res/xlsx.full.min.js"></script>
+    <script src="res/html2canvas.min.js"></script>
 </head>
 <body>
     <!-- 工具栏 -->
     <div class="toolbar">
-        <label class="toolbar-btn" for="excelFile">📂 上传Excel</label>
+        <button class="toolbar-btn" id="uploadBtn">📂 上传Excel</button>
         <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none;">
         <span class="toolbar-filename" id="fileName">未选择文件</span>
+        <label class="toolbar-label">📅 日期：</label>
+        <input type="date" id="dateInput" class="toolbar-date">
         <button class="toolbar-btn" id="screenshotBtn">📸 保存截图</button>
     </div>
 
@@ -176,15 +178,39 @@
     </div>
 
     <script>
-        // 显示今天的日期
+        // 日期设置
+        const dateInput = document.getElementById('dateInput');
         const now = new Date();
-        const year = now.getFullYear();
+        dateInput.value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+
+        // 存储当前加载的workbook
+        let currentWorkbook = null;
+
+        function updateDate() {
+            const parts = dateInput.value.split('-');
+            document.getElementById('currentDate').textContent = parts[0] + '.' + parts[1] + '.' + parts[2];
+            // 日期变更时重新处理已加载的数据
+            if (currentWorkbook) {
+                const selectedDate = new Date(dateInput.value);
+                processCommendSheet(currentWorkbook, selectedDate);
+                processNoticeSheet(currentWorkbook, selectedDate);
+            }
+        }
+        updateDate();
+        dateInput.addEventListener('change', updateDate);
+
+        // 用于截图文件名
+        const year = String(now.getFullYear());
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
-        document.getElementById('currentDate').textContent = year + '.' + month + '.' + day;
 
         // Excel上传处理
-        document.getElementById('excelFile').addEventListener('change', function(e) {
+        const excelInput = document.getElementById('excelFile');
+        document.getElementById('uploadBtn').addEventListener('click', function() {
+            excelInput.value = '';
+            excelInput.click();
+        });
+        excelInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             document.getElementById('fileName').textContent = file.name;
@@ -193,23 +219,183 @@
             reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
+                currentWorkbook = workbook;
 
-                // 读取"表扬通报"sheet
-                const commendSheet = workbook.Sheets['表扬通报'];
-                if (commendSheet) {
-                    const commendData = XLSX.utils.sheet_to_json(commendSheet, { header: 1 });
-                    renderTable('.commend-section .report-table tbody', commendData);
-                }
+                console.log('Excel loaded, sheets:', workbook.SheetNames);
 
-                // 读取"违规通报"sheet
-                const noticeSheet = workbook.Sheets['违规通报'];
-                if (noticeSheet) {
-                    const noticeData = XLSX.utils.sheet_to_json(noticeSheet, { header: 1 });
-                    renderTable('.notice-section .report-table tbody', noticeData);
-                }
+                // 获取黑板报设置的日期
+                const selectedDate = new Date(dateInput.value);
+
+                // 处理表扬通报
+                processCommendSheet(workbook, selectedDate);
+
+                // 处理违规通报
+                processNoticeSheet(workbook, selectedDate);
             };
             reader.readAsArrayBuffer(file);
+            // 重置input以允许再次选择同一文件
+            setTimeout(function() { excelInput.value = ''; }, 100);
         });
+
+        // 解析中文日期 "2025年12月23日" -> Date
+        function parseChineseDate(str) {
+            if (!str) return null;
+            const m = String(str).match(/(\d{4})\u5e74(\d{1,2})\u6708(\d{1,2})\u65e5/);
+            if (m) return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+            // 尝试直接解析
+            const d = new Date(str);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        // 处理表扬通报数据
+        function processCommendSheet(workbook, selectedDate) {
+            const sheetName = '【表扬】通报登记清单-表扬';
+            const sheet = workbook.Sheets[sheetName];
+            if (!sheet) return;
+
+            const allRows = XLSX.utils.sheet_to_json(sheet);
+            if (allRows.length === 0) return;
+
+            // 找到"表扬内容"列名（以"表扬内容"开头）
+            const keys = Object.keys(allRows[0]);
+            const contentKey = keys.find(k => k.startsWith('表扬内容'));
+
+            // 计算7天前的日期
+            const sevenDaysAgo = new Date(selectedDate);
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+            // 筛选条件：
+            // 1. 事件发生时间在 [selectedDate-7天, selectedDate] 之间
+            // 2. 状态非"（驳回）取消发布"，非"已发布"
+            // 3. 处长/员工 为 "处长"
+            const filtered = allRows.filter(row => {
+                const eventDate = parseChineseDate(row['事件发生时间']);
+                if (!eventDate) return false;
+                if (eventDate < sevenDaysAgo || eventDate > selectedDate) return false;
+
+                const status = String(row['状态'] || '');
+                if (status === '（驳回）取消发布' || status === '已发布') return false;
+
+                const role = String(row['处长/员工'] || '');
+                if (role !== '员工') return false;
+
+                return true;
+            });
+
+            console.log('表扬通报: 总行数', allRows.length, '日期范围', sevenDaysAgo.toLocaleDateString(), '-', selectedDate.toLocaleDateString(), '筛选后', filtered.length, '条');
+
+            // 找到"表扬依据"列名（以"表扬依据"开头）
+            const basisKey = keys.find(k => k.startsWith('表扬依据'));
+
+            // 计算累计：按表扬依据统计所有状态非"（驳回）取消发布"的记录数
+            const cumulativeCount = {};
+            allRows.forEach(row => {
+                const status = String(row['状态'] || '');
+                if (status !== '（驳回）取消发布') {
+                    const basis = String(basisKey ? (row[basisKey] || '') : '');
+                    if (basis) {
+                        cumulativeCount[basis] = (cumulativeCount[basis] || 0) + 1;
+                    }
+                }
+            });
+
+            // 映射为表格数据：姓名、所属处室(表扬发起部门)、事件类型(通报事件类型)、表扬事件(表扬内容)、累计
+            const tbody = document.querySelector('.commend-section .report-table tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            filtered.forEach(row => {
+                const tr = document.createElement('tr');
+                const basis = String(basisKey ? (row[basisKey] || '') : '');
+                const fields = [
+                    String(row['姓名'] || ''),
+                    String(row['表扬发起部门'] || ''),
+                    String(row['通报事件类型'] || ''),
+                    String(contentKey ? (row[contentKey] || '') : ''),
+                    (cumulativeCount[basis] || 0) + '次'
+                ];
+                fields.forEach(val => {
+                    const td = document.createElement('td');
+                    td.textContent = val;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 处理违规通报数据
+        function processNoticeSheet(workbook, selectedDate) {
+            const sheetName = '【批评】通报登记清单-批评';
+            const sheet = workbook.Sheets[sheetName];
+            if (!sheet) return;
+
+            const allRows = XLSX.utils.sheet_to_json(sheet);
+            if (allRows.length === 0) return;
+
+            const keys = Object.keys(allRows[0]);
+            // 找到"批评内容"列名（以"批评内容"开头）
+            const contentKey = keys.find(k => k.startsWith('批评内容'));
+
+            // 计算7天前的日期
+            const sevenDaysAgo = new Date(selectedDate);
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+            // 筛选条件同表扬：
+            // 1. 事件发生时间在 [selectedDate-7天, selectedDate] 之间
+            // 2. 状态非"（驳回）取消发布"，非"已发布"
+            // 3. 员工/处长 为 "处长"
+            const filtered = allRows.filter(row => {
+                const eventDate = parseChineseDate(row['事件发生时间']);
+                if (!eventDate) return false;
+                if (eventDate < sevenDaysAgo || eventDate > selectedDate) return false;
+
+                const status = String(row['状态'] || '');
+                if (status === '（驳回）取消发布' || status === '已发布') return false;
+
+                const role = String(row['员工/处长'] || '');
+                if (role !== '员工') return false;
+
+                return true;
+            });
+
+            console.log('违规通报: 总行数', allRows.length, '日期范围', sevenDaysAgo.toLocaleDateString(), '-', selectedDate.toLocaleDateString(), '筛选后', filtered.length, '条');
+
+            // 计算累计：按批评依据统计所有状态非"（驳回）取消发布"的记录数
+            const cumulativeCount = {};
+            allRows.forEach(row => {
+                const status = String(row['状态'] || '');
+                if (status !== '（驳回）取消发布') {
+                    const basis = String(row['批评依据'] || '');
+                    if (basis) {
+                        cumulativeCount[basis] = (cumulativeCount[basis] || 0) + 1;
+                    }
+                }
+            });
+
+            // 映射：姓名、所属处室(处室)、事件类型(通报事件类型)、违规事件(批评内容)、通报依据(批评依据)、累计
+            const tbody = document.querySelector('.notice-section .report-table tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            filtered.forEach(row => {
+                const tr = document.createElement('tr');
+                const basis = String(row['批评依据'] || '');
+                const fields = [
+                    String(row['姓名'] || ''),
+                    String(row['处室'] || ''),
+                    String(row['通报事件类型'] || ''),
+                    String(contentKey ? (row[contentKey] || '') : ''),
+                    basis,
+                    (cumulativeCount[basis] || 0) + '次'
+                ];
+                fields.forEach(val => {
+                    const td = document.createElement('td');
+                    td.textContent = val;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
 
         function renderTable(tbodySelector, data) {
             const tbody = document.querySelector(tbodySelector);

@@ -46,6 +46,18 @@ body {
     flex: 1;
 }
 
+.toolbar-label {
+    font-size: 14px;
+    color: #333;
+}
+
+.toolbar-date {
+    padding: 6px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 .poster {
     width: 1440px;
     min-height: 100vh;
