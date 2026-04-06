@@ -260,41 +260,28 @@
             const keys = Object.keys(allRows[0]);
             const contentKey = keys.find(k => k.startsWith('表扬内容'));
 
-            // 计算7天前的日期
-            const sevenDaysAgo = new Date(selectedDate);
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-            // 筛选条件：
-            // 1. 事件发生时间在 [selectedDate-7天, selectedDate] 之间
-            // 2. 状态非"（驳回）取消发布"，非"已发布"
-            // 3. 处长/员工 为 "处长"
+            // 筛选条件：状态非"（驳回）取消发布"且非"已发布"
             const filtered = allRows.filter(row => {
-                const eventDate = parseChineseDate(row['事件发生时间']);
-                if (!eventDate) return false;
-                if (eventDate < sevenDaysAgo || eventDate > selectedDate) return false;
-
                 const status = String(row['状态'] || '');
                 if (status === '（驳回）取消发布' || status === '已发布') return false;
-
-                const role = String(row['处长/员工'] || '');
-                if (role !== '员工') return false;
-
                 return true;
             });
 
-            console.log('表扬通报: 总行数', allRows.length, '日期范围', sevenDaysAgo.toLocaleDateString(), '-', selectedDate.toLocaleDateString(), '筛选后', filtered.length, '条');
+            console.log('表扬通报: 总行数', allRows.length, '筛选后', filtered.length, '条');
 
             // 找到"表扬依据"列名（以"表扬依据"开头）
             const basisKey = keys.find(k => k.startsWith('表扬依据'));
 
-            // 计算累计：按表扬依据统计所有状态非"（驳回）取消发布"的记录数
+            // 计算累计：按姓名+表扬依据统计所有状态非"（驳回）取消发布"的记录数
             const cumulativeCount = {};
             allRows.forEach(row => {
                 const status = String(row['状态'] || '');
                 if (status !== '（驳回）取消发布') {
+                    const name = String(row['姓名'] || '');
                     const basis = String(basisKey ? (row[basisKey] || '') : '');
-                    if (basis) {
-                        cumulativeCount[basis] = (cumulativeCount[basis] || 0) + 1;
+                    if (name && basis) {
+                        const key = name + '||' + basis;
+                        cumulativeCount[key] = (cumulativeCount[key] || 0) + 1;
                     }
                 }
             });
@@ -306,13 +293,15 @@
 
             filtered.forEach(row => {
                 const tr = document.createElement('tr');
+                const name = String(row['姓名'] || '');
                 const basis = String(basisKey ? (row[basisKey] || '') : '');
+                const key = name + '||' + basis;
                 const fields = [
-                    String(row['姓名'] || ''),
-                    String(row['表扬发起部门'] || ''),
+                    name,
+                    String(row['处室'] || ''),
                     String(row['通报事件类型'] || ''),
                     String(contentKey ? (row[contentKey] || '') : ''),
-                    (cumulativeCount[basis] || 0) + '次'
+                    (cumulativeCount[key] || 0) + '次'
                 ];
                 fields.forEach(val => {
                     const td = document.createElement('td');
@@ -336,38 +325,25 @@
             // 找到"批评内容"列名（以"批评内容"开头）
             const contentKey = keys.find(k => k.startsWith('批评内容'));
 
-            // 计算7天前的日期
-            const sevenDaysAgo = new Date(selectedDate);
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-            // 筛选条件同表扬：
-            // 1. 事件发生时间在 [selectedDate-7天, selectedDate] 之间
-            // 2. 状态非"（驳回）取消发布"，非"已发布"
-            // 3. 员工/处长 为 "处长"
+            // 筛选条件：状态非"（驳回）取消发布"且非"已发布"
             const filtered = allRows.filter(row => {
-                const eventDate = parseChineseDate(row['事件发生时间']);
-                if (!eventDate) return false;
-                if (eventDate < sevenDaysAgo || eventDate > selectedDate) return false;
-
                 const status = String(row['状态'] || '');
                 if (status === '（驳回）取消发布' || status === '已发布') return false;
-
-                const role = String(row['员工/处长'] || '');
-                if (role !== '员工') return false;
-
                 return true;
             });
 
-            console.log('违规通报: 总行数', allRows.length, '日期范围', sevenDaysAgo.toLocaleDateString(), '-', selectedDate.toLocaleDateString(), '筛选后', filtered.length, '条');
+            console.log('违规通报: 总行数', allRows.length, '筛选后', filtered.length, '条');
 
-            // 计算累计：按批评依据统计所有状态非"（驳回）取消发布"的记录数
+            // 计算累计：按姓名+批评依据统计所有状态非"（驳回）取消发布"的记录数
             const cumulativeCount = {};
             allRows.forEach(row => {
                 const status = String(row['状态'] || '');
                 if (status !== '（驳回）取消发布') {
+                    const name = String(row['姓名'] || '');
                     const basis = String(row['批评依据'] || '');
-                    if (basis) {
-                        cumulativeCount[basis] = (cumulativeCount[basis] || 0) + 1;
+                    if (name && basis) {
+                        const key = name + '||' + basis;
+                        cumulativeCount[key] = (cumulativeCount[key] || 0) + 1;
                     }
                 }
             });
@@ -379,14 +355,16 @@
 
             filtered.forEach(row => {
                 const tr = document.createElement('tr');
+                const name = String(row['姓名'] || '');
                 const basis = String(row['批评依据'] || '');
+                const key = name + '||' + basis;
                 const fields = [
-                    String(row['姓名'] || ''),
+                    name,
                     String(row['处室'] || ''),
                     String(row['通报事件类型'] || ''),
                     String(contentKey ? (row[contentKey] || '') : ''),
                     basis,
-                    (cumulativeCount[basis] || 0) + '次'
+                    (cumulativeCount[key] || 0) + '次'
                 ];
                 fields.forEach(val => {
                     const td = document.createElement('td');
