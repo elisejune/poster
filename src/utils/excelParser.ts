@@ -6,6 +6,7 @@
  */
 
 import * as XLSX from 'xlsx'
+import { parseChineseDate } from './dateUtils'
 
 /** 表扬通报行 */
 export interface CommendRow {
@@ -14,6 +15,7 @@ export interface CommendRow {
   eventType: string
   event: string
   cumulative: number
+  date: Date | null
 }
 
 /** 违规通报行 */
@@ -24,6 +26,7 @@ export interface NoticeRow {
   event: string
   basis: string
   cumulative: number
+  date: Date | null
 }
 
 /**
@@ -31,6 +34,20 @@ export interface NoticeRow {
  */
 function findKey(keys: string[], prefix: string): string | undefined {
   return keys.find(k => k.startsWith(prefix))
+}
+
+/**
+ * 解析 Excel 单元格中的日期值
+ */
+function parseExcelDate(value: unknown): Date | null {
+  if (value == null) return null
+  // Excel 序列号
+  if (typeof value === 'number') {
+    const epoch = new Date(1899, 11, 30)
+    return new Date(epoch.getTime() + value * 86400000)
+  }
+  // 中文日期或其他字符串
+  return parseChineseDate(String(value))
 }
 
 /**
@@ -82,6 +99,8 @@ export function parseCommendData(workbook: XLSX.WorkBook): CommendRow[] {
   const contentKey = findKey(keys, '表扬内容') || ''
   const basisKey = findKey(keys, '表扬依据') || ''
 
+  const dateKey = findKey(keys, '事件发生时间') || '事件发生时间'
+
   const cumulativeMap = buildCumulativeMap(allRows, basisKey)
   const filtered = allRows.filter(isPending)
 
@@ -95,6 +114,7 @@ export function parseCommendData(workbook: XLSX.WorkBook): CommendRow[] {
       eventType: String(row['通报事件类型'] || ''),
       event: String(contentKey ? (row[contentKey] || '') : ''),
       cumulative: cumulativeMap.get(key) || 0,
+      date: parseExcelDate(row[dateKey]),
     }
   })
 }
@@ -112,6 +132,8 @@ export function parseNoticeData(workbook: XLSX.WorkBook): NoticeRow[] {
   const keys = Object.keys(allRows[0])
   const contentKey = findKey(keys, '批评内容') || ''
 
+  const dateKey = findKey(keys, '事件发生时间') || '事件发生时间'
+
   const cumulativeMap = buildCumulativeMap(allRows, '批评依据')
   const filtered = allRows.filter(isPending)
 
@@ -126,6 +148,7 @@ export function parseNoticeData(workbook: XLSX.WorkBook): NoticeRow[] {
       event: String(contentKey ? (row[contentKey] || '') : ''),
       basis,
       cumulative: cumulativeMap.get(key) || 0,
+      date: parseExcelDate(row[dateKey]),
     }
   })
 }

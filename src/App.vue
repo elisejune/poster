@@ -31,7 +31,7 @@ import PosterHeader from './components/PosterHeader.vue'
 import ReportTable from './components/ReportTable.vue'
 import { useExcel } from './composables/useExcel'
 import { useScreenshot } from './composables/useScreenshot'
-import { formatDateISO, formatDateDot } from './utils/dateUtils'
+import { formatDateISO, formatDateDot, isInPreviousWeek } from './utils/dateUtils'
 
 const posterRef = ref<HTMLElement | null>(null)
 const dateValue = ref(formatDateISO(new Date()))
@@ -44,26 +44,32 @@ const displayDate = computed(() => {
 const { fileName, commendData, noticeData, loadFile } = useExcel()
 const { takeScreenshot } = useScreenshot()
 
-const commendRows = computed(() =>
-  commendData.value.map(r => [
-    r.name,
-    r.department,
-    r.eventType,
-    r.event,
-    r.cumulative + '次',
-  ])
-)
+const commendRows = computed(() => {
+  const endDate = new Date(dateValue.value)
+  return commendData.value
+    .filter(r => isInPreviousWeek(r.date, endDate))
+    .map(r => [
+      r.name,
+      r.department,
+      r.eventType,
+      r.event,
+      r.cumulative + '次',
+    ])
+})
 
-const noticeRows = computed(() =>
-  noticeData.value.map(r => [
-    r.name,
-    r.department,
-    r.eventType,
-    r.event,
-    r.basis,
-    r.cumulative + '次',
-  ])
-)
+const noticeRows = computed(() => {
+  const endDate = new Date(dateValue.value)
+  return noticeData.value
+    .filter(r => isInPreviousWeek(r.date, endDate))
+    .map(r => [
+      r.name,
+      r.department,
+      r.eventType,
+      r.event,
+      r.basis,
+      r.cumulative + '次',
+    ])
+})
 
 function onScreenshot() {
   if (posterRef.value) {

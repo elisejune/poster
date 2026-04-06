@@ -42,3 +42,16 @@ export function formatDateCompact(date: Date): string {
   const d = String(date.getDate()).padStart(2, '0')
   return `${y}${m}${d}`
 }
+
+/**
+ * 判断日期是否在 [weekStart, weekEnd] 范围内（即 endDate 前一周）
+ * endDate 为选定日期，范围为 endDate-6 ~ endDate
+ */
+export function isInPreviousWeek(date: Date | null, endDate: Date): boolean {
+  if (!date) return false
+  const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59, 59, 999)
+  const start = new Date(end)
+  start.setDate(start.getDate() - 6)
+  start.setHours(0, 0, 0, 0)
+  return date >= start && date <= end
+}
