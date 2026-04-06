@@ -1,0 +1,216 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+}
+
+/* ==================== 工具栏 ==================== */
+
+.toolbar {
+  width: 1440px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  margin-bottom: 10px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar-btn {
+  padding: 8px 20px;
+  font-size: 16px;
+  background: #2196f3;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toolbar-btn:hover {
+  background: #1976d2;
+}
+
+.toolbar-filename {
+  font-size: 14px;
+  color: #666;
+  flex: 1;
+}
+
+.toolbar-label {
+  font-size: 14px;
+  color: #333;
+}
+
+.toolbar-date {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* ==================== 海报容器 ==================== */
+
+.poster {
+  width: 1440px;
+  min-height: 100vh;
+  background-color: #ffffff;
+  background-image: url('/bg-header.png');
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-position: top left;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ==================== 标题部分 ==================== */
+
+.header-section {
+  margin-top: 200px;
+  margin-left: 60px;
+  position: relative;
+}
+
+.title-area {
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+}
+
+.main-title {
+  font-size: 150px;
+  color: #ffffff;
+  text-align: left;
+  letter-spacing: 10px;
+  line-height: 1.15;
+  font-weight: bold;
+}
+
+.date-text {
+  font-size: 60px;
+  color: #ffffff;
+  margin-left: -300px;
+  margin-bottom: 10px;
+  white-space: nowrap;
+}
+
+.subtitle {
+  font-size: 60px;
+  color: #2196f3;
+  text-align: left;
+  margin-top: 40px;
+  display: inline-block;
+  background-color: #ffffff;
+  padding: 10px 20px;
+  font-weight: bold;
+}
+
+.description {
+  font-size: 36px;
+  color: #ffffff;
+  text-align: left;
+  margin-top: 40px;
+  line-height: 1.8;
+  opacity: 0.9;
+}
+
+/* ==================== 通报部分 ==================== */
+
+.report-section {
+  margin-left: 30px;
+  margin-right: 30px;
+  position: relative;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-position: top left;
+  min-height: 400px;
+  padding-bottom: 50px;
+}
+
+.commend-section {
+  background-image: url('/bg-commend.png');
+  padding-top: 350px;
+}
+
+.notice-section {
+  background-image: url('/bg-notice.png');
+  padding-top: 320px;
+}
+
+/* ==================== 表格样式 ==================== */
+
+.report-table {
+  margin-top: 0;
+  margin-left: 50px;
+  margin-right: 50px;
+  width: calc(100% - 100px);
+  border-collapse: collapse;
+  font-size: 32px;
+  table-layout: fixed;
+}
+
+/* 表扬通报列宽 */
+.commend-section .report-table th:nth-child(1),
+.commend-section .report-table td:nth-child(1) { width: 120px; }
+.commend-section .report-table th:nth-child(2),
+.commend-section .report-table td:nth-child(2) { width: 200px; }
+.commend-section .report-table th:nth-child(3),
+.commend-section .report-table td:nth-child(3) { width: 200px; }
+.commend-section .report-table th:nth-child(5),
+.commend-section .report-table td:nth-child(5) { width: 120px; }
+
+/* 违规通报列宽 */
+.notice-section .report-table th:nth-child(1),
+.notice-section .report-table td:nth-child(1) { width: 120px; }
+.notice-section .report-table th:nth-child(2),
+.notice-section .report-table td:nth-child(2) { width: 200px; }
+.notice-section .report-table th:nth-child(3),
+.notice-section .report-table td:nth-child(3) { width: 200px; }
+.notice-section .report-table th:nth-child(5),
+.notice-section .report-table td:nth-child(5) { width: 300px; }
+.notice-section .report-table th:nth-child(6),
+.notice-section .report-table td:nth-child(6) { width: 120px; }
+
+.report-table th,
+.report-table td {
+  padding: 16px 20px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+/* 表扬通报表头 */
+.commend-section .report-table th {
+  background-color: #b3d4fc;
+  font-weight: bold;
+  font-size: 32px;
+  color: #333;
+}
+
+/* 违规通报表头 */
+.notice-section .report-table th {
+  background-color: #e74c3c;
+  font-weight: bold;
+  font-size: 32px;
+  color: #ffffff;
+}
+
+/* 表格内容行 */
+.report-table td {
+  background-color: #ffffff;
+  font-size: 28px;
+  color: #333;
+}
+
+.report-table tr:nth-child(even) td {
+  background-color: #f9f9f9;
+}
