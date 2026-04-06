@@ -1,0 +1,138 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.poster {
+    width: 1440px;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a3a5c 0%, #0d2137 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* ==================== 标题部分 ==================== */
+.header-section {
+    margin-top: 200px;
+    margin-left: 60px;
+    position: relative;
+}
+
+.title-area {
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+}
+
+.main-title {
+    font-size: 150px;
+    color: #ffffff;
+    text-align: left;
+    letter-spacing: 10px;
+    line-height: 1.15;
+    font-weight: bold;
+}
+
+.date-text {
+    font-size: 60px;
+    color: #ffffff;
+    margin-left: 100px;
+    margin-bottom: 40px;
+    white-space: nowrap;
+}
+
+.subtitle {
+    font-size: 60px;
+    color: #2196F3;
+    text-align: left;
+    margin-top: 40px;
+    display: inline-block;
+    background-color: #ffffff;
+    padding: 10px 20px;
+    font-weight: bold;
+}
+
+.description {
+    font-size: 36px;
+    color: #ffffff;
+    text-align: left;
+    margin-top: 40px;
+    line-height: 1.8;
+    opacity: 0.9;
+}
+
+/* ==================== 通报部分通用样式 ==================== */
+.report-section {
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-top: 100px;
+    position: relative;
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    background-position: top left;
+    min-height: 400px;
+    padding-bottom: 50px;
+}
+
+/* ==================== 表扬通报 ==================== */
+.commend-section {
+    background-image: url('res/bg-commend.png');
+}
+
+/* ==================== 违规通报 ==================== */
+.notice-section {
+    background-image: url('res/bg-notice.png');
+}
+
+/* ==================== 表格样式 ==================== */
+.report-table {
+    margin-top: 100px;
+    margin-left: 50px;
+    margin-right: 50px;
+    width: calc(100% - 100px);
+    border-collapse: collapse;
+    font-size: 32px;
+    table-layout: fixed;
+}
+
+.report-table th,
+.report-table td {
+    padding: 16px 20px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+/* 表扬通报表头 */
+.commend-section .report-table th {
+    background-color: #b3d4fc;
+    font-weight: bold;
+    font-size: 32px;
+    color: #333;
+}
+
+/* 违规通报表头 */
+.notice-section .report-table th {
+    background-color: #e74c3c;
+    font-weight: bold;
+    font-size: 32px;
+    color: #ffffff;
+}
+
+/* 表格内容行 */
+.report-table td {
+    background-color: #ffffff;
+    font-size: 28px;
+    color: #333;
+}
+
+.report-table tr:nth-child(even) td {
+    background-color: #f9f9f9;
+}

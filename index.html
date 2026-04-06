@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信息技术部黑板报</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="poster">
+        <!-- 标题部分 -->
+        <div class="header-section">
+            <div class="title-area">
+                <div class="main-title">信息技术部<br>黑板报</div>
+                <div class="date-text" id="currentDate"></div>
+            </div>
+            <div class="subtitle">只要读懂了客户，科技的突破则水到渠成</div>
+            <div class="description">
+                阳光科技人必须以"争创第一，追求极致"的心气和决心；<br>
+                以最懂客户的底气；以最懂技术的能力；<br>
+                以永不满足的进取精神；<br>
+                渐进积累、颠覆突破、实现第一、靠近极致。<br>
+                以科技创造未来！
+            </div>
+        </div>
+
+        <!-- 表扬通报部分 -->
+        <div class="report-section commend-section">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>所属处室</th>
+                        <th>事件类型</th>
+                        <th>表扬事件</th>
+                        <th>累计</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>张三</td>
+                        <td>开发一处</td>
+                        <td>技术创新</td>
+                        <td>独立完成核心模块重构，性能提升50%</td>
+                        <td>3次</td>
+                    </tr>
+                    <tr>
+                        <td>李四</td>
+                        <td>测试处</td>
+                        <td>质量保障</td>
+                        <td>发现并修复关键安全漏洞，避免重大损失</td>
+                        <td>2次</td>
+                    </tr>
+                    <tr>
+                        <td>王五</td>
+                        <td>运维处</td>
+                        <td>应急响应</td>
+                        <td>凌晨紧急处理服务器故障，保障系统稳定运行</td>
+                        <td>5次</td>
+                    </tr>
+                    <tr>
+                        <td>赵六</td>
+                        <td>开发二处</td>
+                        <td>团队协作</td>
+                        <td>主动协助跨部门项目，推动项目提前交付</td>
+                        <td>1次</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 违规通报部分 -->
+        <div class="report-section notice-section">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>所属处室</th>
+                        <th>事件类型</th>
+                        <th>违规事件</th>
+                        <th>通报依据</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>孙七</td>
+                        <td>开发三处</td>
+                        <td>代码规范</td>
+                        <td>未经代码审查直接提交生产环境</td>
+                        <td>《代码管理规范》第3.2条</td>
+                    </tr>
+                    <tr>
+                        <td>周八</td>
+                        <td>运维处</td>
+                        <td>安全违规</td>
+                        <td>共享个人账号密码给他人使用</td>
+                        <td>《信息安全管理制度》第5.1条</td>
+                    </tr>
+                    <tr>
+                        <td>吴九</td>
+                        <td>测试处</td>
+                        <td>流程违规</td>
+                        <td>跳过测试流程直接上线功能模块</td>
+                        <td>《项目管理规范》第4.3条</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 显示今天的日期
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        document.getElementById('currentDate').textContent = year + '.' + month + '.' + day;
+    </script>
+</body>
+</html>
