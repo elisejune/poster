@@ -3,29 +3,32 @@
     :file-name="fileName"
     :date-value="dateValue"
     @update:date-value="dateValue = $event"
-    @upload="loadFile"
+    @upload="onUpload"
     @screenshot="onScreenshot"
+    @refresh="onRefresh"
   />
+
+  <div class="toast" :class="toast.type" v-if="toast.visible">{{ toast.message }}</div>
 
   <div ref="posterRef" class="poster">
     <PosterHeader :display-date="displayDate" />
 
     <ReportTable
       section-class="commend-section"
-      :columns="['姓名', '所属处室', '事件类型', '表扬事件', '累计']"
+      :columns="['姓名', '所属处室', '事件类型', '表扬事件', '同类事件累计次数']"
       :rows="commendRows"
     />
 
     <ReportTable
       section-class="notice-section"
-      :columns="['姓名', '所属处室', '事件类型', '违规事件', '通报依据', '累计']"
+      :columns="['姓名', '所属处室', '事件类型', '违规事件', '通报依据', '同类事件累计次数']"
       :rows="noticeRows"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import AppToolbar from './components/AppToolbar.vue'
 import PosterHeader from './components/PosterHeader.vue'
 import ReportTable from './components/ReportTable.vue'
@@ -41,8 +44,37 @@ const displayDate = computed(() => {
   return `${parts[0]}.${parts[1]}.${parts[2]}`
 })
 
-const { fileName, commendData, noticeData, loadFile } = useExcel()
+const { fileName, commendData, noticeData, loadFile, refresh } = useExcel()
 const { takeScreenshot } = useScreenshot()
+
+const toast = reactive({ visible: false, message: '', type: 'success' as 'success' | 'error' | 'info' })
+let toastTimer: ReturnType<typeof setTimeout> | null = null
+
+function showToast(message: string, type: 'success' | 'error' | 'info' = 'success') {
+  if (toastTimer) clearTimeout(toastTimer)
+  toast.message = message
+  toast.type = type
+  toast.visible = true
+  toastTimer = setTimeout(() => { toast.visible = false }, 2500)
+}
+
+async function onUpload(file: File) {
+  try {
+    await loadFile(file)
+    showToast(`✅ 文件 "${file.name}" 加载成功，共 ${commendData.value.length} 条表扬、${noticeData.value.length} 条批评记录`)
+  } catch {
+    showToast('❌ 文件读取失败，请检查文件格式', 'error')
+  }
+}
+
+async function onRefresh() {
+  try {
+    await refresh()
+    showToast('✅ 数据已刷新')
+  } catch {
+    showToast('⚠️ 请先上传 Excel 文件', 'error')
+  }
+}
 
 const commendRows = computed(() => {
   const endDate = new Date(dateValue.value)
@@ -75,7 +107,14 @@ const noticeRows = computed(() => {
 
 function onScreenshot() {
   if (posterRef.value) {
-    takeScreenshot(posterRef.value)
+    showToast('📸 正在生成截图...', 'info')
+    takeScreenshot(posterRef.value).then(() => {
+      showToast('✅ 截图已保存')
+    }).catch(() => {
+      showToast('❌ 截图生成失败', 'error')
+    })
+  } else {
+    showToast('⚠️ 无法获取海报内容', 'error')
   }
 }
 </script>

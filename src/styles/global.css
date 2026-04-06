@@ -9,21 +9,25 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 0;
+  padding: 80px 0 20px;
 }
 
 /* ==================== 工具栏 ==================== */
 
 .toolbar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
   width: 1440px;
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 12px 20px;
-  margin-bottom: 10px;
   background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .toolbar-btn {
@@ -167,7 +171,7 @@ body {
 .commend-section .report-table th:nth-child(3),
 .commend-section .report-table td:nth-child(3) { width: 200px; }
 .commend-section .report-table th:nth-child(5),
-.commend-section .report-table td:nth-child(5) { width: 120px; }
+.commend-section .report-table td:nth-child(5) { width: 180px; }
 
 /* 违规通报列宽 */
 .notice-section .report-table th:nth-child(1),
@@ -179,7 +183,7 @@ body {
 .notice-section .report-table th:nth-child(5),
 .notice-section .report-table td:nth-child(5) { width: 300px; }
 .notice-section .report-table th:nth-child(6),
-.notice-section .report-table td:nth-child(6) { width: 120px; }
+.notice-section .report-table td:nth-child(6) { width: 180px; }
 
 .report-table th,
 .report-table td {
@@ -213,4 +217,31 @@ body {
 
 .report-table tr:nth-child(even) td {
   background-color: #f9f9f9;
+}
+
+/* ==================== Toast 提示 ==================== */
+
+.toast {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  animation: toast-in 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.toast.success { background: #43a047; }
+.toast.error   { background: #e53935; }
+.toast.info    { background: #1e88e5; }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }

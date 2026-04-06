@@ -9,6 +9,7 @@
       @change="onFileChange"
     />
     <span class="toolbar-filename">{{ fileName }}</span>
+    <button class="toolbar-btn" @click="$emit('refresh')">🔄 刷新数据</button>
     <label class="toolbar-label">📅 日期：</label>
     <input
       type="date"
@@ -32,6 +33,7 @@ const emit = defineEmits<{
   'update:dateValue': [value: string]
   'upload': [file: File]
   'screenshot': []
+  'refresh': []
 }>()
 
 const fileInput = ref<HTMLInputElement | null>(null)
