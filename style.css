@@ -48,8 +48,8 @@ body {
 .date-text {
     font-size: 60px;
     color: #ffffff;
-    margin-left: 100px;
-    margin-bottom: 40px;
+    margin-left: -300px;
+    margin-bottom: 10px;
     white-space: nowrap;
 }
 
