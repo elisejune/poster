@@ -66,6 +66,21 @@ function isPending(row: Record<string, unknown>): boolean {
 }
 
 /**
+ * 查找处长标识列（列名为"员工/处长"或"处长/员工"）
+ */
+function findDirectorKey(keys: string[]): string | undefined {
+  return keys.find(k => k === '员工/处长' || k === '处长/员工')
+}
+
+/**
+ * 判断是否为处长记录
+ */
+function isDirector(row: Record<string, unknown>, directorKey: string | undefined): boolean {
+  if (!directorKey) return false
+  return String(row[directorKey] || '') === '处长'
+}
+
+/**
  * 按 姓名+依据 统计累计次数
  */
 function buildCumulativeMap(
@@ -102,7 +117,8 @@ export function parseCommendData(workbook: XLSX.WorkBook): CommendRow[] {
   const dateKey = findKey(keys, '事件发生时间') || '事件发生时间'
 
   const cumulativeMap = buildCumulativeMap(allRows, basisKey)
-  const filtered = allRows.filter(isPending)
+  const directorKey = findDirectorKey(keys)
+  const filtered = allRows.filter(r => isPending(r) && !isDirector(r, directorKey))
 
   return filtered.map(row => {
     const name = String(row['姓名'] || '')
@@ -135,7 +151,8 @@ export function parseNoticeData(workbook: XLSX.WorkBook): NoticeRow[] {
   const dateKey = findKey(keys, '事件发生时间') || '事件发生时间'
 
   const cumulativeMap = buildCumulativeMap(allRows, '批评依据')
-  const filtered = allRows.filter(isPending)
+  const directorKey = findDirectorKey(keys)
+  const filtered = allRows.filter(r => isPending(r) && !isDirector(r, directorKey))
 
   return filtered.map(row => {
     const name = String(row['姓名'] || '')
