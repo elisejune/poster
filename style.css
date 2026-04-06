@@ -108,6 +108,35 @@ body {
     table-layout: fixed;
 }
 
+/* 表扬通报列宽：姓名、所属处室、事件类型、表扬事件(自动)、累计 */
+.commend-section .report-table th:nth-child(1),
+.commend-section .report-table td:nth-child(1) { width: 120px; }
+
+.commend-section .report-table th:nth-child(2),
+.commend-section .report-table td:nth-child(2) { width: 200px; }
+
+.commend-section .report-table th:nth-child(3),
+.commend-section .report-table td:nth-child(3) { width: 200px; }
+
+.commend-section .report-table th:nth-child(5),
+.commend-section .report-table td:nth-child(5) { width: 120px; }
+
+/* 违规通报列宽：姓名、所属处室、事件类型、违规事件(自动)、通报依据、累计 */
+.notice-section .report-table th:nth-child(1),
+.notice-section .report-table td:nth-child(1) { width: 120px; }
+
+.notice-section .report-table th:nth-child(2),
+.notice-section .report-table td:nth-child(2) { width: 200px; }
+
+.notice-section .report-table th:nth-child(3),
+.notice-section .report-table td:nth-child(3) { width: 200px; }
+
+.notice-section .report-table th:nth-child(5),
+.notice-section .report-table td:nth-child(5) { width: 300px; }
+
+.notice-section .report-table th:nth-child(6),
+.notice-section .report-table td:nth-child(6) { width: 120px; }
+
 .report-table th,
 .report-table td {
     padding: 16px 20px;
