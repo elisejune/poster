@@ -5,9 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>信息技术部黑板报</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
-    <div class="poster">
+    <!-- 工具栏 -->
+    <div class="toolbar">
+        <label class="toolbar-btn" for="excelFile">📂 上传Excel</label>
+        <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none;">
+        <span class="toolbar-filename" id="fileName">未选择文件</span>
+        <button class="toolbar-btn" id="screenshotBtn">📸 保存截图</button>
+    </div>
+
+    <div class="poster" id="poster">
         <!-- 标题部分 -->
         <div class="header-section">
             <div class="title-area">
@@ -172,6 +182,71 @@
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         document.getElementById('currentDate').textContent = year + '.' + month + '.' + day;
+
+        // Excel上传处理
+        document.getElementById('excelFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            document.getElementById('fileName').textContent = file.name;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                // 读取"表扬通报"sheet
+                const commendSheet = workbook.Sheets['表扬通报'];
+                if (commendSheet) {
+                    const commendData = XLSX.utils.sheet_to_json(commendSheet, { header: 1 });
+                    renderTable('.commend-section .report-table tbody', commendData);
+                }
+
+                // 读取"违规通报"sheet
+                const noticeSheet = workbook.Sheets['违规通报'];
+                if (noticeSheet) {
+                    const noticeData = XLSX.utils.sheet_to_json(noticeSheet, { header: 1 });
+                    renderTable('.notice-section .report-table tbody', noticeData);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function renderTable(tbodySelector, data) {
+            const tbody = document.querySelector(tbodySelector);
+            if (!tbody || data.length < 2) return;
+            tbody.innerHTML = '';
+            // 第一行是表头，从第二行开始是数据
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                if (!row || row.length === 0) continue;
+                const tr = document.createElement('tr');
+                for (let j = 0; j < row.length; j++) {
+                    const td = document.createElement('td');
+                    td.textContent = row[j] != null ? String(row[j]) : '';
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            }
+        }
+
+        // 截图功能
+        document.getElementById('screenshotBtn').addEventListener('click', function() {
+            const poster = document.getElementById('poster');
+            html2canvas(poster, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: null,
+                width: poster.scrollWidth,
+                height: poster.scrollHeight,
+                windowWidth: poster.scrollWidth,
+                windowHeight: poster.scrollHeight
+            }).then(function(canvas) {
+                const link = document.createElement('a');
+                link.download = '黑板报_' + year + month + day + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        });
     </script>
 </body>
 </html>
