@@ -18,12 +18,14 @@
       section-class="commend-section"
       :columns="['姓名', '所属处室', '事件类型', '表扬事件', '同类事件累计次数']"
       :rows="commendRows"
+      :empty-message="'本周无表扬事件'"
     />
 
     <ReportTable
       section-class="notice-section"
       :columns="['姓名', '所属处室', '事件类型', '违规事件', '通报依据', '同类事件累计次数']"
       :rows="noticeRows"
+      :empty-message="'本周无违规事件，继续保持～'"
     />
   </div>
 </template>
