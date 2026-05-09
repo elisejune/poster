@@ -1,4 +1,3 @@
-import * as XLSX from 'xlsx'
 import type { ExtractedDocument } from '../types/review'
 
 const imageExtensions = ['png', 'jpg', 'jpeg', 'webp', 'bmp', 'gif']
@@ -37,22 +36,56 @@ export async function extractDocumentText(file: File): Promise<ExtractedDocument
 }
 
 async function extractExcelText(file: File): Promise<string> {
-  const data = new Uint8Array(await file.arrayBuffer())
-  const workbook = XLSX.read(data, { type: 'array' })
+  const ExcelJS = await import('exceljs')
+  const workbook = new ExcelJS.Workbook()
+  await workbook.xlsx.load(await file.arrayBuffer())
 
-  return workbook.SheetNames.map((sheetName) => {
-    const sheet = workbook.Sheets[sheetName]
-    const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: '' })
-    if (rows.length === 0) return `【${sheetName}】\n（空表）`
+  const sheets: string[] = []
+  workbook.eachSheet((worksheet) => {
+    const headers = readWorksheetHeaders(worksheet)
+    const lines: string[] = []
 
-    const lines = rows.map((row, index) => {
-      const cells = Object.entries(row)
-        .filter(([, value]) => String(value).trim() !== '')
-        .map(([key, value]) => `${key}：${String(value).trim()}`)
-      return `第 ${index + 1} 行：${cells.join('；')}`
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return
+      const cells: string[] = []
+      row.eachCell((cell, colNumber) => {
+        const value = formatCellValue(cell.value)
+        if (!value) return
+        const header = headers[colNumber] || `第 ${colNumber} 列`
+        cells.push(`${header}：${value}`)
+      })
+      if (cells.length > 0) {
+        lines.push(`第 ${rowNumber - 1} 行：${cells.join('；')}`)
+      }
     })
-    return `【${sheetName}】\n${lines.join('\n')}`
-  }).join('\n\n')
+
+    sheets.push(`【${worksheet.name}】\n${lines.length ? lines.join('\n') : '（空表）'}`)
+  })
+
+  return sheets.join('\n\n')
+}
+
+function readWorksheetHeaders(worksheet: import('exceljs').Worksheet): Record<number, string> {
+  const headers: Record<number, string> = {}
+  const headerRow = worksheet.getRow(1)
+  headerRow.eachCell((cell, colNumber) => {
+    const value = formatCellValue(cell.value)
+    if (value) headers[colNumber] = value
+  })
+  return headers
+}
+
+function formatCellValue(value: import('exceljs').CellValue): string {
+  if (value == null) return ''
+  if (value instanceof Date) return value.toLocaleDateString()
+  if (typeof value === 'object') {
+    if ('text' in value && value.text) return String(value.text).trim()
+    if ('result' in value && value.result != null) return String(value.result).trim()
+    if ('richText' in value && Array.isArray(value.richText)) {
+      return value.richText.map(item => item.text).join('').trim()
+    }
+  }
+  return String(value).trim()
 }
 
 async function extractWordText(file: File): Promise<string> {

@@ -2,8 +2,8 @@
   <section class="review-workspace">
     <div class="review-hero">
       <div>
-        <p class="eyebrow">智能内容校正与管理评审工具</p>
-        <h1>原文保真、行业对标、专家评审、董事会呈现</h1>
+        <p class="eyebrow">独立项目 · 智能内容校正与管理评审工具</p>
+        <h1>原文保真、行业对标、专家评审、产品落地、董事会呈现</h1>
         <p>
           支持文本、图片、Excel、Word、PDF。所有修改都必须说明“从什么改成什么”，可能改变含义的内容会标记为需确认。
         </p>
@@ -64,7 +64,7 @@
           <span>2</span>
           <div>
             <h2>角色与审核链路</h2>
-            <p>产品经理已把需求拆成稳定流程，并由多角色协同审核。</p>
+            <p>多角色协同，把原始内容转成可执行、可汇报的管理材料。</p>
           </div>
         </div>
 
@@ -149,11 +149,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { industryBenchmarks } from '../config/industryBenchmarks'
-import { reviewRoles } from '../config/reviewRoles'
-import { extractDocumentText } from '../services/documentExtractors'
-import { runReviewPipeline } from '../services/reviewPipeline'
-import type { ExtractedDocument, ReviewPipelineResult } from '../types/review'
+import { industryBenchmarks } from './config/industryBenchmarks'
+import { reviewRoles } from './config/reviewRoles'
+import { extractDocumentText } from './services/documentExtractors'
+import { runReviewPipeline } from './services/reviewPipeline'
+import type { ExtractedDocument, ReviewPipelineResult } from './types/review'
 
 const sourceText = ref('')
 const industryId = ref('general')
