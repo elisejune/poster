@@ -1,149 +1,143 @@
 <template>
-  <section class="review-workspace">
-    <div class="review-hero">
-      <div>
-        <p class="eyebrow">独立项目 · 智能内容校正与管理评审工具</p>
-        <h1>原文保真、行业对标、专家评审、产品落地、董事会呈现</h1>
-        <p>
-          支持文本、图片、Excel、Word、PDF。所有修改都必须说明“从什么改成什么”，可能改变含义的内容会标记为需确认。
-        </p>
-      </div>
-      <div class="review-guardrail">
-        <strong>核心规则</strong>
-        <span>默认遵循原文，不擅自改变事实、立场和结论。</span>
-      </div>
-    </div>
+  <section class="assistant-page">
+    <header class="assistant-header">
+      <p class="eyebrow">独立项目 · 智能内容校正与管理评审工具</p>
+      <h1>把材料发给我，我来做校正、评审和董事会呈现版</h1>
+      <p>
+        支持文字、图片、Excel、Word、PDF。默认尊重原文含义，所有修改都说明“原文 -> 修改后 -> 修改原因”。
+      </p>
+    </header>
 
-    <div class="review-grid">
-      <div class="review-card">
-        <div class="section-heading">
-          <span>1</span>
-          <div>
-            <h2>输入内容</h2>
-            <p>可粘贴文字，或上传 txt、xlsx、docx、pdf、图片。</p>
+    <main class="assistant-shell">
+      <section class="chat-entry-card">
+        <div class="assistant-avatar">AI</div>
+        <div class="entry-content">
+          <div class="entry-title">
+            <h2>请输入或上传需要审核的内容</h2>
+            <span>像对话一样提交材料</span>
           </div>
-        </div>
 
-        <textarea
-          v-model="sourceText"
-          class="review-textarea"
-          placeholder="请粘贴需要校正和评审的原文..."
-        />
+          <textarea
+            v-model="sourceText"
+            class="chat-textarea"
+            placeholder="例如：粘贴制度、汇报材料、通知、经营分析、董事会草稿，或上传文件..."
+          />
 
-        <div class="review-actions">
-          <label class="upload-chip">
-            上传文件
-            <input
-              type="file"
-              accept=".txt,.xlsx,.xls,.docx,.pdf,.png,.jpg,.jpeg,.webp,.bmp,.gif"
-              @change="onFileChange"
-            />
-          </label>
-          <select v-model="industryId" class="review-select">
-            <option v-for="industry in industryBenchmarks" :key="industry.id" :value="industry.id">
-              {{ industry.name }}
-            </option>
-          </select>
-          <button class="primary-action" :disabled="isBusy || !sourceText.trim()" @click="startReview">
-            {{ isBusy ? '审核中...' : '开始审核' }}
-          </button>
-        </div>
-
-        <div v-if="extractedFile" class="file-summary">
-          <strong>{{ extractedFile.fileName }}</strong>
-          <span>{{ extractedFile.fileType }}</span>
-        </div>
-        <p v-if="statusMessage" class="status-message">{{ statusMessage }}</p>
-        <ul v-if="warnings.length" class="warning-list">
-          <li v-for="warning in warnings" :key="warning">{{ warning }}</li>
-        </ul>
-      </div>
-
-      <div class="review-card">
-        <div class="section-heading">
-          <span>2</span>
-          <div>
-            <h2>角色与审核链路</h2>
-            <p>多角色协同，把原始内容转成可执行、可汇报的管理材料。</p>
+          <div class="entry-toolbar">
+            <label class="upload-chip">
+              上传文件
+              <input
+                type="file"
+                accept=".txt,.xlsx,.xls,.docx,.pdf,.png,.jpg,.jpeg,.webp,.bmp,.gif"
+                @change="onFileChange"
+              />
+            </label>
+            <select v-model="industryId" class="review-select" aria-label="选择行业">
+              <option v-for="industry in industryBenchmarks" :key="industry.id" :value="industry.id">
+                {{ industry.name }}
+              </option>
+            </select>
+            <button class="send-action" :disabled="isBusy || !sourceText.trim()" @click="startReview">
+              {{ isBusy ? '处理中...' : '开始审核' }}
+            </button>
           </div>
-        </div>
 
-        <div class="role-list">
-          <article v-for="role in reviewRoles" :key="role.id" class="role-item">
-            <h3>{{ role.title }}</h3>
-            <strong>{{ role.name }}</strong>
-            <p>{{ role.goal }}</p>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <div class="review-card full-width">
-      <div class="section-heading">
-        <span>3</span>
-        <div>
-          <h2>审核结果</h2>
-          <p>如未配置 AI 后端，系统会输出可复制的完整提示词。</p>
-        </div>
-      </div>
-
-      <div class="result-grid">
-        <article v-for="section in result?.sections" :key="section.title" class="result-section">
-          <h3>{{ section.title }}</h3>
-          <p>{{ section.summary }}</p>
-          <ul>
-            <li v-for="item in section.items" :key="item">{{ item }}</li>
+          <div v-if="extractedFile" class="file-summary">
+            <strong>{{ extractedFile.fileName }}</strong>
+            <span>{{ extractedFile.fileType }}</span>
+          </div>
+          <p v-if="statusMessage" class="status-message">{{ statusMessage }}</p>
+          <ul v-if="warnings.length" class="warning-list">
+            <li v-for="warning in warnings" :key="warning">{{ warning }}</li>
           </ul>
-        </article>
-      </div>
-
-      <div v-if="result" class="change-table-wrap">
-        <h3>修改追踪</h3>
-        <table class="change-table">
-          <thead>
-            <tr>
-              <th>原文</th>
-              <th>修改后</th>
-              <th>修改原因</th>
-              <th>是否改变含义</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(change, index) in result.changes" :key="index">
-              <td>{{ change.originalText }}</td>
-              <td>{{ change.revisedText }}</td>
-              <td>{{ change.reason }}</td>
-              <td>
-                <span :class="['meaning-badge', change.meaningChanged ? 'needs-confirm' : 'safe']">
-                  {{ change.meaningChanged ? '是，需确认' : '否' }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-if="result" class="board-draft">
-        <h3>董事会呈现版</h3>
-        <p>{{ result.boardDraft }}</p>
-      </div>
-    </div>
-
-    <div v-if="result?.prompts.length" class="review-card full-width">
-      <div class="section-heading">
-        <span>4</span>
-        <div>
-          <h2>可复制审核提示词</h2>
-          <p>用于接入 AI 后端或手动复制到 AI 工具执行。</p>
         </div>
-      </div>
+      </section>
 
-      <details v-for="prompt in result.prompts" :key="prompt.title" class="prompt-block">
-        <summary>{{ prompt.title }}</summary>
-        <textarea readonly :value="prompt.prompt" />
-        <button class="secondary-action" @click="copyPrompt(prompt.prompt)">复制提示词</button>
-      </details>
-    </div>
+      <section class="quick-role-strip">
+        <article v-for="role in reviewRoles" :key="role.id" class="role-pill">
+          <strong>{{ role.name }}</strong>
+          <span>{{ role.title }}</span>
+        </article>
+      </section>
+
+      <section v-if="result" class="conversation-results">
+        <article class="message user-message">
+          <div class="message-avatar">你</div>
+          <div class="message-bubble">
+            <h3>已提交的原文</h3>
+            <p>{{ sourceText }}</p>
+          </div>
+        </article>
+
+        <article class="message assistant-message">
+          <div class="message-avatar">AI</div>
+          <div class="message-bubble">
+            <h3>审核结果</h3>
+            <div class="result-grid">
+              <section v-for="section in result.sections" :key="section.title" class="result-section">
+                <h4>{{ section.title }}</h4>
+                <p>{{ section.summary }}</p>
+                <ul>
+                  <li v-for="item in section.items" :key="item">{{ item }}</li>
+                </ul>
+              </section>
+            </div>
+          </div>
+        </article>
+
+        <article class="message assistant-message">
+          <div class="message-avatar">AI</div>
+          <div class="message-bubble">
+            <h3>修改追踪</h3>
+            <div class="change-table-wrap">
+              <table class="change-table">
+                <thead>
+                  <tr>
+                    <th>原文</th>
+                    <th>修改后</th>
+                    <th>修改原因</th>
+                    <th>是否改变含义</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(change, index) in result.changes" :key="index">
+                    <td>{{ change.originalText }}</td>
+                    <td>{{ change.revisedText }}</td>
+                    <td>{{ change.reason }}</td>
+                    <td>
+                      <span :class="['meaning-badge', change.meaningChanged ? 'needs-confirm' : 'safe']">
+                        {{ change.meaningChanged ? '是，需确认' : '否' }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+
+        <article class="message assistant-message">
+          <div class="message-avatar">AI</div>
+          <div class="message-bubble board-draft">
+            <h3>董事会呈现版</h3>
+            <p>{{ result.boardDraft }}</p>
+          </div>
+        </article>
+
+        <article v-if="result.prompts.length" class="message assistant-message">
+          <div class="message-avatar">AI</div>
+          <div class="message-bubble">
+            <h3>可复制审核提示词</h3>
+            <p class="hint-text">用于接入 AI 后端或手动复制到 AI 工具执行。</p>
+            <details v-for="prompt in result.prompts" :key="prompt.title" class="prompt-block">
+              <summary>{{ prompt.title }}</summary>
+              <textarea readonly :value="prompt.prompt" />
+              <button class="secondary-action" @click="copyPrompt(prompt.prompt)">复制提示词</button>
+            </details>
+          </div>
+        </article>
+      </section>
+    </main>
   </section>
 </template>
 
