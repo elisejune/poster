@@ -3,6 +3,7 @@ export type ReviewStage =
   | 'language'
   | 'industry'
   | 'expert'
+  | 'productManager'
   | 'copy'
   | 'generalManager'
 

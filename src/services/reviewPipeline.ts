@@ -117,7 +117,17 @@ export function createReviewPrompts(input: ReviewPipelineInput): PipelinePrompt[
       ].join('\n\n'),
     },
     {
-      title: '6. 总经理审核与董事会呈现版',
+      title: '6. 产品经理需求细化与落地',
+      prompt: [
+        fidelityBlock,
+        sourceBlock,
+        expertPrompt('product-manager'),
+        '请把原文需求和前面审核建议整理成稳定 PRD，输出产品目标、用户场景、功能清单、流程、页面结构、字段/输出格式、优先级和验收标准。',
+        '必须区分“原文明确提出的需求”和“产品经理建议补充的落地内容”。',
+      ].join('\n\n'),
+    },
+    {
+      title: '7. 总经理审核与董事会呈现版',
       prompt: [
         fidelityBlock,
         sourceBlock,
@@ -148,6 +158,12 @@ function createPromptOnlyResult(input: ReviewPipelineInput, prompts: PipelinePro
         `先进实践：${industry.bestPractices.join('、')}`,
         `风险：${industry.risks.join('、')}`,
       ],
+    },
+    {
+      stage: 'productManager',
+      title: '产品经理落地',
+      summary: '产品经理会把审核建议转化为 PRD、功能清单、用户流程、页面结构和验收标准。',
+      items: ['稳定需求文档', '功能优先级', '页面交互', '验收标准', '后续迭代建议'],
     },
   ]
 

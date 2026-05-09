@@ -82,6 +82,18 @@ export const reviewRoles: ReviewRole[] = [
     outputFocus: ['自然表达', '简洁清晰', '可执行', '保留原意'],
   },
   {
+    id: 'product-manager',
+    name: '产品经理',
+    title: '需求细化与落地负责人',
+    goal: '把业务想法转化为清晰、可开发、可测试、可交付的产品需求。',
+    responsibilities: [
+      '整理稳定需求文档，明确目标用户、场景、流程和边界。',
+      '拆分功能模块、优先级、输入输出、异常处理和验收标准。',
+      '把专家建议转化为产品版本计划、页面交互和可执行任务。',
+    ],
+    outputFocus: ['PRD', '功能清单', '用户流程', '页面结构', '验收标准', '迭代建议'],
+  },
+  {
     id: 'general-manager',
     name: '总经理',
     title: '董事会呈现审核',
