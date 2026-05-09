@@ -1,33 +1,42 @@
 <template>
-  <AppToolbar
-    :file-name="fileName"
-    :date-value="dateValue"
-    :status-text="statusText"
-    @update:date-value="dateValue = $event"
-    @upload="onUpload"
-    @screenshot="onScreenshot"
-    @refresh="onRefresh"
-  />
-
-  <div class="toast" :class="toast.type" v-if="toast.visible">{{ toast.message }}</div>
-
-  <div ref="posterRef" class="poster">
-    <PosterHeader :display-date="displayDate" />
-
-    <ReportTable
-      section-class="commend-section"
-      :columns="['姓名', '所属处室', '事件类型', '表扬事件', '同类事件累计次数']"
-      :rows="commendRows"
-      :empty-message="'本周无表扬事件'"
-    />
-
-    <ReportTable
-      section-class="notice-section"
-      :columns="['姓名', '所属处室', '事件类型', '违规事件', '通报依据', '同类事件累计次数']"
-      :rows="noticeRows"
-      :empty-message="'本周无违规事件，继续保持～'"
-    />
+  <div class="mode-switcher">
+    <button :class="{ active: activeMode === 'review' }" @click="activeMode = 'review'">智能校正评审</button>
+    <button :class="{ active: activeMode === 'poster' }" @click="activeMode = 'poster'">通报海报</button>
   </div>
+
+  <SmartReviewWorkspace v-if="activeMode === 'review'" />
+
+  <template v-else>
+    <AppToolbar
+      :file-name="fileName"
+      :date-value="dateValue"
+      :status-text="statusText"
+      @update:date-value="dateValue = $event"
+      @upload="onUpload"
+      @screenshot="onScreenshot"
+      @refresh="onRefresh"
+    />
+
+    <div class="toast" :class="toast.type" v-if="toast.visible">{{ toast.message }}</div>
+
+    <div ref="posterRef" class="poster">
+      <PosterHeader :display-date="displayDate" />
+
+      <ReportTable
+        section-class="commend-section"
+        :columns="['姓名', '所属处室', '事件类型', '表扬事件', '同类事件累计次数']"
+        :rows="commendRows"
+        :empty-message="'本周无表扬事件'"
+      />
+
+      <ReportTable
+        section-class="notice-section"
+        :columns="['姓名', '所属处室', '事件类型', '违规事件', '通报依据', '同类事件累计次数']"
+        :rows="noticeRows"
+        :empty-message="'本周无违规事件，继续保持～'"
+      />
+    </div>
+  </template>
 </template>
 
 <script setup lang="ts">
@@ -35,12 +44,14 @@ import { ref, computed, reactive } from 'vue'
 import AppToolbar from './components/AppToolbar.vue'
 import PosterHeader from './components/PosterHeader.vue'
 import ReportTable from './components/ReportTable.vue'
+import SmartReviewWorkspace from './components/SmartReviewWorkspace.vue'
 import { useExcel } from './composables/useExcel'
 import { useScreenshot } from './composables/useScreenshot'
-import { formatDateISO, formatDateDot, isInPreviousWeek } from './utils/dateUtils'
+import { formatDateISO, isInPreviousWeek } from './utils/dateUtils'
 
 const posterRef = ref<HTMLElement | null>(null)
 const dateValue = ref(formatDateISO(new Date()))
+const activeMode = ref<'review' | 'poster'>('review')
 
 const displayDate = computed(() => {
   const parts = dateValue.value.split('-')
