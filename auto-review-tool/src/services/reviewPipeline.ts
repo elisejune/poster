@@ -149,6 +149,16 @@ function createPromptOnlyResult(input: ReviewPipelineInput, prompts: PipelinePro
       items: fidelityPrinciples,
     },
     {
+      stage: 'language',
+      title: '错别字与语句通顺审核',
+      summary: '语言审核会检查错别字、标点、病句、语义重复、前后矛盾和语句不通顺问题。',
+      items: [
+        '所有修改都必须输出“原文 -> 修改后 -> 修改原因”。',
+        '不改变原文事实、立场、结论和判断口径。',
+        '可能改变含义的修改会标记为“需用户确认”。',
+      ],
+    },
+    {
       stage: 'industry',
       title: `行业对标：${industry.name}`,
       summary: '行业对标将围绕关注点、指标、先进实践和典型风险输出建议补充。',
@@ -160,10 +170,40 @@ function createPromptOnlyResult(input: ReviewPipelineInput, prompts: PipelinePro
       ],
     },
     {
+      stage: 'expert',
+      title: '三位管理专家评审',
+      summary: '战略、运营、组织绩效三位专家会分别给出建议，并区分原文已有依据和建议补充。',
+      items: [
+        '战略与商业模式专家：评估战略价值、商业模式、决策关注点和潜在风险。',
+        '卓越运营与流程专家：评估流程、责任、KPI 和管理闭环。',
+        '组织绩效与变革专家：评估组织影响、绩效牵引、变革风险和落地保障。',
+      ],
+    },
+    {
+      stage: 'copy',
+      title: '文案校正者优化',
+      summary: '文案校正者会把内容优化为自然、简洁、一看就懂、可执行落地的表达。',
+      items: [
+        '去除机器化、空泛和重复表达。',
+        '保留原文含义，不擅自增删事实。',
+        '每一处改写都保留修改追踪记录。',
+      ],
+    },
+    {
       stage: 'productManager',
       title: '产品经理落地',
       summary: '产品经理会把审核建议转化为 PRD、功能清单、用户流程、页面结构和验收标准。',
       items: ['稳定需求文档', '功能优先级', '页面交互', '验收标准', '后续迭代建议'],
+    },
+    {
+      stage: 'generalManager',
+      title: '总经理审核与董事会呈现',
+      summary: '总经理会从董事会视角审核经营价值、风险、资源需求和待决策事项。',
+      items: [
+        '检查是否说清问题、原因、措施、结果。',
+        '明确董事会摘要、行动建议和待决策事项。',
+        '标注哪些内容来自原文，哪些属于建议补充。',
+      ],
     },
   ]
 
@@ -171,7 +211,11 @@ function createPromptOnlyResult(input: ReviewPipelineInput, prompts: PipelinePro
     prompts,
     sections,
     changes: createInitialChangeGuides(),
-    boardDraft: '配置 VITE_AI_REVIEW_ENDPOINT 后可自动生成董事会呈现版；当前可复制下方提示词到 AI 工具生成。',
+    boardDraft: [
+      '配置 VITE_AI_REVIEW_ENDPOINT 后可自动生成董事会呈现版。',
+      '当前页面已生成完整分阶段提示词，可复制到 AI 工具执行。',
+      '董事会呈现版将包含：原文核心摘要、经营价值、风险与应对、行动建议、待决策事项，并明确区分“原文已有内容”和“建议补充内容”。',
+    ].join('\n'),
   }
 }
 
